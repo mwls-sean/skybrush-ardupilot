@@ -230,6 +230,14 @@ void AC_DroneShowManager::_update_lights()
     bool light_signal_affected_by_brightness_setting = true;
     bool enhance_brightness = false;
     int brightness = _params.preflight_light_signal_brightness;
+    int new_brightness = brightness;
+    if(brightness == 1) {
+        new_brightness = 33;
+    }else if(brightness == 2) {
+        new_brightness = 66;
+    }else if(brightness == 3) {
+        new_brightness = 100;
+    }
     uint8_t pattern = 0b11111111;
     const uint8_t BLINK = 0b11110000;
     const uint8_t BLINK_TWICE_PER_SECOND = 0b11001100;
@@ -266,8 +274,8 @@ void AC_DroneShowManager::_update_lights()
 
         // Make sure that this light signal is visible with a minimum intensity
         // if the user otherwise turned off the light signals
-        if (brightness < 1) {
-            brightness = 1;
+        if (new_brightness < 33) {
+            new_brightness = 33;
         }
     } else if (_light_signal.started_at_msec) {
         // If the user requested a light signal, it trumps everything except
@@ -474,25 +482,19 @@ void AC_DroneShowManager::_update_lights()
 
     // Dim the lights if we are on the ground before the flight
     if (light_signal_affected_by_brightness_setting) {
-        uint8_t shift = 0;
+        float percent = 1.0;
 
-        if (brightness <= 0) {
-            // <= 0 = completely off, shift by 8 bits
-            shift = 8;
-        } else if (brightness == 1) {
-            // 1 = low brightness, keep the 6 MSB so the maximum is 64
-            shift = 2;
-        } else if (brightness == 2) {
-            // 2 = medium brightness, keep the 7 MSB so the maximum is 128
-            shift = 1;
+        if (new_brightness >= 100) {
+            percent = 1.0;
+        } else if (new_brightness <= 0) {
+            percent = 0.0;
         } else {
-            // >= 2 = full brightness
-            shift = 0;
+            percent = (float)new_brightness / 100.0f;
         }
 
-        color.red >>= shift;
-        color.green >>= shift;
-        color.blue >>= shift;
+        color.red *= percent;
+        color.green *= percent;
+        color.blue *= percent;
     }
 
     _last_rgb_led_color = color;
