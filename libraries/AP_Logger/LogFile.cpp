@@ -381,11 +381,12 @@ void AP_Logger::Write_Power(void)
 #endif
 }
 
-void AP_Logger::Write_Radio(const mavlink_radio_t &packet)
+void AP_Logger::Write_Radio(const mavlink_radio_t &packet, uint8_t instance)
 {
     const struct log_Radio pkt{
         LOG_PACKET_HEADER_INIT(LOG_RADIO_MSG),
         time_us      : AP_HAL::micros64(),
+        instance     : instance,
         rssi         : packet.rssi,
         remrssi      : packet.remrssi,
         txbuf        : packet.txbuf,

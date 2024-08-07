@@ -255,7 +255,7 @@ public:
 #endif
     void Write_NamedValueFloat(const char *name, float value);
     void Write_Power(void);
-    void Write_Radio(const mavlink_radio_t &packet);
+    void Write_Radio(const mavlink_radio_t &packet, uint8_t instance);
     void Write_Message(const char *message);
     void Write_MessageF(const char *fmt, ...);
     void Write_ServoStatus(uint64_t time_us, uint8_t id, float position, float force, float speed, uint8_t power_pct,
