@@ -179,12 +179,12 @@ void AP_GPS_Backend::send_mavlink_gps_rtk(mavlink_channel_t chan)
     switch (instance) {
         case 0:
             mavlink_msg_gps_rtk_send(chan,
-                                 0,  // Not implemented yet
+                                 0,  // Not implemented yet 
                                  0,  // Not implemented yet
                                  state.rtk_week_number,
                                  state.rtk_time_week_ms,
                                  0,  // Not implemented yet
-                                 0,  // Not implemented yet
+                                 state.rtk_msg_rcv_rate,
                                  state.rtk_num_sats,
                                  state.rtk_baseline_coords_type,
                                  state.rtk_baseline_x_mm,
@@ -200,7 +200,7 @@ void AP_GPS_Backend::send_mavlink_gps_rtk(mavlink_channel_t chan)
                                  state.rtk_week_number,
                                  state.rtk_time_week_ms,
                                  0,  // Not implemented yet
-                                 0,  // Not implemented yet
+                                 state.rtk_msg_rcv_rate,
                                  state.rtk_num_sats,
                                  state.rtk_baseline_coords_type,
                                  state.rtk_baseline_x_mm,

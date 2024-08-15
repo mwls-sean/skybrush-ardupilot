@@ -29,6 +29,7 @@
 #include <AP_ExternalAHRS/AP_ExternalAHRS.h>
 #include <SITL/SIM_GPS.h>
 #include <GCS_MAVLink/GCS_MAVLink.h>
+#include <AP_HAL_ChibiOS/RateTracker.h>
 
 /**
    maximum number of GPS instances available on this platform. If more
@@ -228,7 +229,8 @@ public:
         int32_t  rtk_baseline_z_mm;        ///< Current baseline in ECEF z or NED down component in mm
         uint32_t rtk_accuracy;             ///< Current estimate of 3D baseline accuracy (receiver dependent, typical 0 to 9999)
         int32_t  rtk_iar_num_hypotheses;   ///< Current number of integer ambiguity hypotheses
-        
+        uint8_t  rtk_msg_rcv_rate;         ///< The rate at which the GPS unit is receiving RTCM messages
+
         // UBX Relative Position and Heading message information
         float relPosHeading;               ///< Reported Heading in degrees
         float relPosLength;                ///< Reported Position horizontal distance in meters
@@ -666,6 +668,8 @@ private:
     GPS_State state[GPS_MAX_INSTANCES];
     AP_GPS_Backend *drivers[GPS_MAX_RECEIVERS];
     AP_HAL::UARTDriver *_port[GPS_MAX_RECEIVERS];
+    // rtk rtcm rate metrics for mavlink message
+    RateTracker rtcm_rcv_rate_tracker;
 
     /// primary GPS instance
     uint8_t primary_instance;
