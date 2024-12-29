@@ -6,8 +6,9 @@ assert(param:add_param(PARAM_TABLE_KEY, 1, 'FAN_THRESH', 60), 'could not add FAN
 assert(param:add_param(PARAM_TABLE_KEY, 2, 'FAN_ENABLED', 0), 'could not add FAN_ENABLED')
 
 local gpio_state = 0
-local threshold = Parameter("MWD_FAN_THRESH") or 60
-local enabled = Parameter("MWD_FAN_ENABLED") or 0
+local threshold = param:get("MWD_FAN_THRESH") or 60
+local enabled = param:get("MWD_FAN_ENABLED") or 0
+local off_threshold = threshold - 2
 
 gpio:pinMode(13, 1)
 
@@ -17,21 +18,22 @@ function update ()
     end
 
     local temp = ins:get_temperature(0)
+    
     if temp > threshold and gpio_state ~= 1 then
-        gcs:send_text(0, "Turning fan on.")
-        -- pull gpio high
+        gcs:send_text(0, string.format("Temp @ %.1f, exceeds threshold. Turning fan on.", temp, threshold))
         gpio:write(13, 1)
         gpio_state = 1
-    elseif temp <= threshold and gpio_state == 1 then
-        gcs:send_text(0, "Turning fan off.")
-        -- pull gpio low
+    elseif temp <= off_threshold and gpio_state == 1 then
+        gcs:send_text(0, string.format("Temp @ %.1f, below off threshold. Turning fan off.", temp, off_threshold))
         gpio:write(13, 0)
         gpio_state = 0
     end
 
-    return update, 5000 -- reschedules the loop every 5s
+    return update, 5000
 end
 
-gcs:send_text(0, "Fan control ready.")
+if enabled == 1 then
+    gcs:send_text(0, "Fan control ready.")
+end
 
 return update, 100
